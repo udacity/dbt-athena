@@ -50,7 +50,6 @@ setup(
     author_email="krishna.kumar@udacity.com",
     url="https://github.com/udacity/dbt-athena",
     packages=find_namespace_packages(include=["dbt", "dbt.*"]),
-    packages=["dbt", "dbt.*"],
     package_data={
         "dbt": [
             "include/athena/dbt_project.yml",
