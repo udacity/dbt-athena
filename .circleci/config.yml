@@ -24,6 +24,7 @@ jobs:
       - run:
           name: publish to artifactory pypi
           command: |
+            pip install -U setuptools
             python3.6 setup.py sdist upload -r local
       
 
