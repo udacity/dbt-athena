@@ -46,9 +46,9 @@ setup(
     long_description=long_description,
     long_description_content_type='text/markdown',
 
-    author="Thomas Elvey",
-    author_email="tomelvey@googlemail.com",
-    url="https://github.com/Tomme/dbt-athena",
+    author="Krishna Kumar",
+    author_email="krishna.kumar@udacity.com",
+    url="https://github.com/udacity/dbt-athena",
     packages=find_namespace_packages(include=["dbt", "dbt.*"]),
     include_package_data=True,
     install_requires=[
