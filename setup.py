@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-from setuptools import setup
+from setuptools import find_namespace_packages, setup
 import os
 import re
 
@@ -50,7 +50,7 @@ setup(
     author_email="krishna.kumar@udacity.com",
     url="https://github.com/udacity/dbt-athena",
 
-    # packages=find_namespace_packages(include=["dbt", "dbt.*"]),
+    packages=find_namespace_packages(include=["dbt", "dbt.*"]),
     packages=["dbt", "dbt.*"],
     package_data={
         "dbt": [
