@@ -1,0 +1,35 @@
+version: 2.1
+
+references:
+  defaults: &defaults
+    working_directory: ~/dev/proto_store
+    docker:
+      # https://github.com/udacity/dockerfile-wizard
+      - image: udacityci/crater-lake-build-deploy
+
+jobs:
+  build-publish-pypi:
+    <<: *defaults
+    steps:
+      - checkout
+      - run:
+          name: init .pypirc
+          command: |
+            echo -e "[distutils]" >> ~/.pypirc
+            echo -e "index-servers = local" >> ~/.pypirc
+            echo -e "[local]" >> ~/.pypirc
+            echo -e "repository: https://udacity.jfrog.io/artifactory/api/pypi/pip" >> ~/.pypirc
+            echo -e "username: $ARTIFACTORY_USERNAME" >> ~/.pypirc
+            echo -e "password: $ARTIFACTORY_PASSWORD" >> ~/.pypirc
+      - run:
+          name: publish to artifactory pypi
+          command: |
+            python3.6 setup.py sdist upload -r local
+      
+
+workflows:
+  version: 2
+  build-deploy:
+    jobs:
+      - build-publish-pypi:
+          context: org-global
