@@ -1,10 +1,10 @@
 # dbt-athena
 
-* Supports dbt version `0.20.0`
+* Supports dbt version `1.0.*`
 * Supports [Seeds][seeds]
 * Correctly detects views and their columns
-* **Experimental** support for [incremental models][incremental]
-  * **Only** inserts
+* Support [incremental models][incremental]
+  * Support two incremental update strategies: `insert_overwrite` and `append`
   * Does **not** support the use of `unique_key`
 * **Only** supports Athena engine 2
   * [Changing Athena Engine Versions][engine-change]
@@ -49,6 +49,8 @@ A dbt profile can be configured to run against AWS Athena using the following co
 | database        | Specify the database (Data catalog) to build models into (lowercase **only**)   | Required   | `awsdatacatalog`    |
 | poll_interval   | Interval in seconds to use for polling the status of query results in Athena    | Optional   | `5`                 |
 | aws_profile_name| Profile to use from your AWS shared credentials file.                           | Optional   | `my-profile`        |
+| work_group| Identifier of Athena workgroup   | Optional   | `my-custom-workgroup`        |
+| num_retries| Number of times to retry a failing query | Optional  | `3`  | `5`
 
 **Example profiles.yml entry:**
 ```yaml
@@ -62,6 +64,7 @@ athena:
       schema: dbt
       database: awsdatacatalog
       aws_profile_name: my-profile
+      work_group: my-workgroup
 ```
 
 _Additional information_
@@ -77,13 +80,7 @@ _Additional information_
 * `external_location` (`default=none`)
   * The location where Athena saves your table in Amazon S3
   * If `none` then it will default to `{s3_staging_dir}/tables`
-  * **Note** If you are using a static value, when your table is recreated Athena will not remove the underlying redundant 
-    data causing a `HIVE_PATH_ALREADY_EXISTS` error. Ideally you should set a dynamic value to avoid this issue.
-    Here are some example of dynamic values.
-    * `external_location="s3://dbt-tables/example-directory/" + run_started_at.isoformat()`
-      * [run_started_at][run_started_at]
-    * `external_location="s3://dbt-tables/example-directory/" + invocation_id`
-      * [invocation_id][invocation_id]
+  * If you are using a static value, when your table/partition is recreated underlying data will be cleaned up and overwritten by new data
 * `partitioned_by` (`default=none`)
   * An array list of columns by which the table will be partitioned
   * Limited to creation of 100 partitions (_currently_)
@@ -94,6 +91,8 @@ _Additional information_
 * `format` (`default='parquet'`)
   * The data format for the table
   * Supports `ORC`, `PARQUET`, `AVRO`, `JSON`, or `TEXTFILE`
+* `write_compression` (`default=none`)
+  * The compression type to use for any storage format that allows compression to be specified. To see which options are available, check out [CREATE TABLE AS][create-table-as]
 * `field_delimiter` (`default=none`)
   * Custom field delimiter, for when format is set to `TEXTFILE`
   
@@ -105,8 +104,8 @@ More information: [CREATE TABLE AS][create-table-as]
 
 #### Supported functionality
 
-**Experimental** support for incremental models.
-* **Only** inserts
+Support for incremental models:
+* Support two incremental update strategies with partitioned tables: `insert_overwrite` and `append`
 * Does **not** support the use of `unique_key`
 
 Due to the nature of AWS Athena, not all core dbt functionality is supported.
@@ -127,7 +126,7 @@ The following features of dbt are not implemented on Athena:
         - name: first_table
           identifier: "first table"       # Not like that
         - name: second_table
-          idenfitier: "\"second table\""  # Like this
+          identifier: "\"second table\""  # Like this
   ```
 
 * Tables, schemas and database should only be lowercase

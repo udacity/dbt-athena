@@ -13,7 +13,7 @@ package_name = "dbt-athena"
 
 
 # get this from a separate file
-def _dbt_presto_version() -> str:
+def _dbt_athena_version() -> str:
     _version_path = os.path.join(
         this_directory, "dbt", "adapters", "athena", "__version__.py"
     )
@@ -25,11 +25,11 @@ def _dbt_presto_version() -> str:
         return match.group(1)
 
 
-package_version = _dbt_presto_version()
+package_version = _dbt_athena_version()
 description = """The athena adapter plugin for dbt (data build tool)"""
 
 
-dbt_version = "0.20.0"
+dbt_version = "1.0"
 
 if not package_version.startswith(dbt_version):
     raise ValueError(
@@ -50,16 +50,11 @@ setup(
     author_email="krishna.kumar@udacity.com",
     url="https://github.com/udacity/dbt-athena",
     packages=find_namespace_packages(include=["dbt", "dbt.*"]),
-    package_data={
-        "dbt": [
-            "include/athena/dbt_project.yml",
-            "include/athena/sample_profiles.yml",
-            "include/athena/macros/*.sql",
-            "include/athena/macros/*/*.sql",
-        ]
-    },
+    include_package_data=True,
     install_requires=[
-        "dbt-core==0.20.0",
+        "dbt-core~=1.0.0",
         "pyathena==2.2.0",
+        "boto3==1.18.12",
+        "tenacity==6.3.1",
     ]
 )
