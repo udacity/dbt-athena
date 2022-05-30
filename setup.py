@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-from setuptools import find_namespace_packages, setup
+from setuptools import setup
 import os
 import re
 
@@ -49,8 +49,17 @@ setup(
     author="Krishna Kumar",
     author_email="krishna.kumar@udacity.com",
     url="https://github.com/udacity/dbt-athena",
-    packages=find_namespace_packages(include=["dbt", "dbt.*"]),
-    include_package_data=True,
+
+    # packages=find_namespace_packages(include=["dbt", "dbt.*"]),
+    packages=["dbt", "dbt.*"],
+    package_data={
+        "dbt": [
+            "include/athena/dbt_project.yml",
+            "include/athena/sample_profiles.yml",
+            "include/athena/macros/*.sql",
+            "include/athena/macros/*/*.sql",
+        ]
+    },
     install_requires=[
         "dbt-core>=1.0.1",
         "pyathena>=2.2.0",
